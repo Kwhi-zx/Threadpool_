@@ -24,7 +24,7 @@ private:
     /* need to keep track of threads so we can join them */
     std::vector< std::thread > workers;
     /* the task queue */
-    std::queue< std::function<void()> > tasks;
+    std::queue< std::function<void()> > tasks; 
     /* synchronization */
     std::mutex queue_mutex;
     std::condition_variable condition;
@@ -74,6 +74,13 @@ Threadpool::Threadpool(size_t threads_num): stop(false) {
  *  · Args&& ... args：接收任务参数
  *  · 返回值：返回一个std::future
  *  · -> std::future<xxx> : 尾置返回类型
+ * 
+ * 
+ *  std::queue<std::function<void()>> tasks;
+ *  --> void()： 无参数、无返回值 --> task() 直接执行
+ *  --> 用户提交的任务可能有参数、有返回值
+ *  --> layer 1: 用 std::bind 把函数和参数绑起来，变成无参数调用
+ *  --> layer 2: 用 std::packaged_task 保存返回值，让调用者之后能拿
  */
 template<class F, class... Args>
 auto Threadpool::enqueue(F&& f, Args&&... args)
@@ -130,3 +137,4 @@ Threadpool::~Threadpool() {
 
 
 #endif
+
