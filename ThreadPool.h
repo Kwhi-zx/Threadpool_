@@ -92,7 +92,7 @@ auto Threadpool::enqueue(F&& f, Args&&... args)
     /* std::forward<T>(),完美转发 */
     auto bound_function = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
 
-    /* 定义 packaged_task类型 */
+    /* 定义 packaged_task类型： 无参数，返回类型为 return_type */
     using task_type = std::packaged_task<return_type()>;
 
     /* 用 shared_ptr 管理 */
